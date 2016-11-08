@@ -33,15 +33,51 @@ class Car {
 		
 	}
 
-	function getAllCars() {
+	function getAllCars($q, $sort, $direction) {
 		
-		$stmt=$this->connection->prepare("
+		//mis sort ja järjekord
+		$allowedSortOptions=["id", "plate", "color"]; //ainult need valikud on lubatud (juhul kui keegi peaks URLi hakkama sisestama midagi muud ise)
 		
+		if(!in_array($sort, $allowedSortOptions)){
+			$sort="id";
+		}
+	
+		echo "Sorteerin: ".$sort." ";
+		
+		$orderBy = "ASC";
+		if($direction == "descending"){
+			$orderBy = "DESC";
+		}
+		
+		echo "Järjekord: ".$orderBy." ";
+		
+		if($q==""){
+			echo "ei otsi";
+			
+			$stmt=$this->connection->prepare("
 			SELECT id, plate, color
 			FROM cars_and_colors
 			WHERE deleted IS NULL
+			ORDER BY $sort $orderBy
+			");
+			
+		}else{
+			echo "Otsib: ".$q;
 		
-		");
+			//teen otsisõna
+			//lisan mõlemale poole %
+			$searchword="%".$q."%";
+			
+			$stmt=$this->connection->prepare("
+			SELECT id, plate, color
+			FROM cars_and_colors
+			WHERE deleted IS NULL AND
+			(plate LIKE ? OR color LIKE ?)
+			ORDER BY $sort $orderBy
+			");
+			$stmt->bind_param("ss", $searchword, $searchword);
+		}
+		
 		
 		$stmt->bind_result($id, $plate, $color);
 		$stmt->execute();
@@ -61,7 +97,7 @@ class Car {
 			$car->color=$color;
 			
 			
-			echo $plate."<br>";
+			//echo $plate."<br>";
 			//iga kord massiivi lisan juuurde numbrimärgi
 			array_push($result, $car);
 		}
