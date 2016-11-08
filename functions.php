@@ -1,6 +1,6 @@
 <?php
 
-	require("../../config.php");
+	require("/home/karlkruu/config.php");
 	
 	
 	//ühendus
@@ -8,16 +8,16 @@
 	$mysqli=new mysqli($serverHost, $serverUsername, $serverPassword, $database);
 	
 	//klassid
-	require("User.class.php");
+	require("class/User.class.php");
 	$User=new User($mysqli);
 	
-	require("Interest.class.php");
+	require("class/Interest.class.php");
 	$Interest=new Interest($mysqli);
 	
-	require("Car.class.php");
+	require("class/Car.class.php");
 	$Car=new Car($mysqli);
 	
-	require("Helper.class.php");
+	require("class/Helper.class.php");
 	$Helper=new Helper($mysqli);
 	
 	
